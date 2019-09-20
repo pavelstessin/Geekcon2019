@@ -11,13 +11,15 @@ Notes        :
 ---------------------------------------------------------------------------
 ---------------------------------------------------------------------------*/
 '''
+import json
+
 import requests
 
 
-def get_project_name():
+def generate_project(params):
     url = 'http://192.168.43.31:9000/get_project_name'
     headers = {'content-type': 'application/json'}
     r = requests.get(url, headers=headers)
-    return r.data
+    return json.loads(r.text)
 
 
