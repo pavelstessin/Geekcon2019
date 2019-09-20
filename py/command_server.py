@@ -1,6 +1,8 @@
+import datetime
 from http import HTTPStatus
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from urllib import parse
+
 import commands
 
 PORT = 8000
@@ -13,11 +15,13 @@ class GeekconHTTPRequestHandler(SimpleHTTPRequestHandler):
             parsed = parse.urlparse(self.path)
             command_name = parsed.path[1:]
             params = parse.parse_qs(parsed.query)
-            print('> Command: {}, parameters: {}'.format(command_name, params))
+            curtime = datetime.datetime.now()
+            print('> {} Command: {}, parameters: {}'.format(curtime, command_name, params))
 
             method_to_call = getattr(commands, command_name)
             result = method_to_call(params)
-            print('< Command: {}, parameters: {}, got result: {}\n'.format(command_name, params, result))
+            curtime = datetime.datetime.now()
+            print('< {} Command: {}, parameters: {}, got result: {}\n'.format(curtime, command_name, params, result))
 
             self.send_response(HTTPStatus.OK)
             # self.send_header("Content-type", 'application/json')
