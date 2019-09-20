@@ -39,10 +39,10 @@ def add_data(filename, name_loc, write_data):
                 titles.append(title)
                 blurbs.append(blurb)
 
-        with open("../db/titles_list.txt","w") as f:
+        with open("../../db/titles_list.txt","w") as f:
             f.write(",".join(titles))
 
-        with open("../db/blurbs_list.txt","w") as f:
+        with open("../../db/blurbs_list.txt","w") as f:
             f.write(",".join(blurbs))
 
         nltks = [nltk.pos_tag(nltk.word_tokenize(i)) for i in titles[:]]
@@ -56,10 +56,10 @@ def add_data(filename, name_loc, write_data):
                         else:
                             types_list[ind][citem] += 1
     else:
-        with open("../db/titles_list.txt") as f:
+        with open("../../db/titles_list.txt") as f:
             titles = f.readline().split(",")
 
-        with open("../db/blurbs_list.txt") as f:
+        with open("../../db/blurbs_list.txt") as f:
             blurbs = f.readline().split(",")
 
     if write_data:
@@ -71,17 +71,17 @@ def add_data(filename, name_loc, write_data):
                 else:
                     break
 
-        with open("../db/nnp_randomization_list.txt","w") as f:
+        with open("../../db/nnp_randomization_list.txt","w") as f:
             for ind,nltk_type in enumerate(nltk_types):
                 f.write(",".join(randomization_list[ind]))
                 f.write("\n")
     else:
-        with open("../db/nnp_randomization_list.txt") as f:
+        with open("../../db/nnp_randomization_list.txt") as f:
             for ind,nltk_type in enumerate(nltk_types):
                 randomization_list[ind] = f.readline().strip().split(",")
 
 
-add_data("../db/kickstarter.csv",9,rewrite)
+add_data("../../db/kickstarter.csv",9,rewrite)
 
 def get_project():
     local_rand_list = []

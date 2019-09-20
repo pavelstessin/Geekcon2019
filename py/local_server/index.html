@@ -9,7 +9,7 @@
     const poll = function() {
         const myRequest = new XMLHttpRequest();
         console.log('polling...');
-        myRequest.open('GET', 'http://192.168.43.31:8000/get_project_name?word=i_am_client');
+        myRequest.open('GET', '/client_poll');
         myRequest.send();
         myRequest.onreadystatechange = function () {
             if (myRequest.readyState === 4) {
