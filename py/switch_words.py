@@ -16,136 +16,101 @@ import nltk
 import random
 bad_words = ['the','and','for','project','new','album','film','with','from','your','you','our']
 titles = []
-nnp_list = {}
-randomization_list = []
-rewrite = 1
+blurbs = []
+nltk_types = ["NNP","NN","NNS","JJ","VBP","VBD"]
+randomization_list = [[],[],[],[],[],[]]
+types_list = [{},{},{},{},{},{}]
+rewrite = 0
 debug = 0
 
+
 def add_data(filename, name_loc, write_data):
-    global titles,nnp_list,randomization_list
+    global titles,blurbs,types_list,randomization_list
     if write_data:
         myfile = codecs.open(filename, 'r', encoding='utf-8', errors='ignore')
         lines = myfile.readlines()
         lines.pop(0)
         slines = [i.split(",") for i in lines]
-        titles = [i[name_loc].replace("(Canceled)","") for i in slines if len(i) >= 24 and i[23] == "technology" and i[22] not in ["Apps","Web"] and len(i[name_loc].split()) > 2]
+        for project in slines:
+            if len(project) >= 24 and project[23] == "technology" and project[22] not in ["Apps","Web"] and len(project[name_loc].split()) > 2:
+                title = project[name_loc].replace("(Canceled)","").lower()
+                blurb = project[3]
+                blurb = blurb.replace("I","You").replace(" me "," you ").replace(" my "," your ")
+                titles.append(title)
+                blurbs.append(blurb)
+
         with open("../db/titles_list.txt","w") as f:
             f.write(",".join(titles))
+
+        with open("../db/blurbs_list.txt","w") as f:
+            f.write(",".join(blurbs))
 
         nltks = [nltk.pos_tag(nltk.word_tokenize(i)) for i in titles[:]]
         for this_nltk in nltks[:]:
             for item in this_nltk:
                 citem = item[0].lower()
-                if item[1] == "NNP" and len(citem) > 1 and citem not in bad_words:
-                    if citem not in nnp_list:
-                        nnp_list[citem] = 1
-                    else:
-                        nnp_list[citem] += 1
+                for ind,nltk_type in enumerate(nltk_types):
+                    if item[1] == nltk_type and len(citem) > 1 and citem not in bad_words:
+                        if citem not in types_list[ind]:
+                            types_list[ind][citem] = 1
+                        else:
+                            types_list[ind][citem] += 1
     else:
         with open("../db/titles_list.txt") as f:
             titles = f.readline().split(",")
 
+        with open("../db/blurbs_list.txt") as f:
+            blurbs = f.readline().split(",")
+
     if write_data:
-        sortedd = sorted(nnp_list.items(),key=lambda x: x[1],reverse=1)
-        # print(sortedd[0:1000])
-        for item in sortedd:
-            if item[1] > 20:
-                randomization_list.extend([item[0]]*item[1])
-            else:
-                break
+        for ind,nltk_type in enumerate(nltk_types):
+            sortedd = sorted(types_list[ind].items(),key=lambda x: x[1],reverse=1)
+            for item in sortedd:
+                if item[1] > 20:
+                    randomization_list[ind].extend([item[0]]*item[1])
+                else:
+                    break
 
         with open("../db/nnp_randomization_list.txt","w") as f:
-            f.write(",".join(randomization_list))
+            for ind,nltk_type in enumerate(nltk_types):
+                f.write(",".join(randomization_list[ind]))
+                f.write("\n")
     else:
         with open("../db/nnp_randomization_list.txt") as f:
-            randomization_list = f.readline().split(",")
+            for ind,nltk_type in enumerate(nltk_types):
+                randomization_list[ind] = f.readline().strip().split(",")
 
 
-
-
-def test_random_switch(filename, name_loc):
-    global titles
-    s1_nnp = []
-    s2_nnp = []
-    myfile = codecs.open(filename, 'r', encoding='utf-8', errors='ignore')
-    lines = myfile.readlines()
-    lines.pop(0)
-    slines = [i.split(",") for i in lines]
-    titles = [i[name_loc] for i in slines if len(i) >= 10]# and i[3] == "Technology"]
-    while len(s1_nnp) < 3 or len(s2_nnp) < 4:
-        s1 = random.choice(titles)
-        s2 = random.choice(titles)
-        s1_nltk = nltk.pos_tag(nltk.word_tokenize(s1))
-        s2_nltk = nltk.pos_tag(nltk.word_tokenize(s2))
-        s1_nnp = [i[0] for i in s1_nltk if i[1] == "NNP"]
-        s2_nnp = [i[0] for i in s2_nltk if i[1] == "NNP"]
-
-    print("Sent' 1:",s1)
-    print("S1 nltk:",s1_nltk)
-    print("S1 nnp:",s1_nnp)
-    print("Sent' 2:",s2)
-    print("S2 nltk:",s2_nltk)
-    print("S2 nnp:",s2_nnp)
-    s1_new = s1.replace(random.choice(s1_nnp),random.choice(s2_nnp))
-    s2_new = s2.replace(random.choice(s2_nnp),random.choice(s1_nnp))
-    s1_new = s1_new.replace(random.choice(s1_nnp),random.choice(s2_nnp))
-    s2_new = s2_new.replace(random.choice(s2_nnp),random.choice(s1_nnp))
-    print(s1_new,"\n",s2_new)
-    # for line in lines:
-        # sline = line.split(',')
-        # if sline[3] != 'Technology':
-            # continue
-
-        # tokens = nltk.word_tokenize(sline[1])
-        # tagged = nltk.pos_tag(tokens)
-        # entities = nltk.chunk.ne_chunk(tagged)
-        # # tagged.draw()
-        # for ent in tagged:
-            # print("XXXXXXXXXXXX")
-            # print(ent)
-            # print("XXXXXXXXXXXX")
-
-#add_data("db/ks-projects-201612.csv",1)
-# add_data("../db/ks-projects-201801.csv",1)
 add_data("../db/kickstarter.csv",9,rewrite)
 
-if __name__ == "__main__":
-    for i in range(100):
-        local_rand_list = randomization_list[:]
-        # print(local_rand_list)
-        selected_title = random.choice(titles)
-        selected_title_nltk = nltk.pos_tag(nltk.word_tokenize(selected_title))
-        selected_title_nnps = [i[0] for i in selected_title_nltk if i[1] == "NNP"]
-        if debug:
-            print("ORIGINAL:",selected_title)
-            print(nltk.pos_tag(nltk.word_tokenize(selected_title)))
-        for nnp in selected_title_nnps:
-            nnp_to_replace_with = random.choice(randomization_list)
-            local_rand_list.remove(nnp_to_replace_with)
-            selected_title = selected_title.replace(nnp,nnp_to_replace_with)
-
-        if debug:
-            print("NEW:",selected_title)
-
-        print(selected_title)
-    # print(nnp_list)
-    #print(title_list)
-
 def get_project():
-    local_rand_list = randomization_list[:]
+    local_rand_list = []
+    for rand_list in randomization_list:
+        local_rand_list.append(rand_list[:])
+
     # print(local_rand_list)
     selected_title = random.choice(titles)
+    selected_blurb = blurbs[titles.index(selected_title)]
     selected_title_nltk = nltk.pos_tag(nltk.word_tokenize(selected_title))
-    selected_title_nnps = [i[0] for i in selected_title_nltk if i[1] == "NNP"]
     if debug:
         print("ORIGINAL:",selected_title)
         print(nltk.pos_tag(nltk.word_tokenize(selected_title)))
-        for nnp in selected_title_nnps:
-            nnp_to_replace_with = random.choice(randomization_list)
-            local_rand_list.remove(nnp_to_replace_with)
-            selected_title = selected_title.replace(nnp,nnp_to_replace_with)
+
+    for ind,nltk_type in enumerate(nltk_types):
+        selected_title_type = [i[0] for i in selected_title_nltk if i[1] == nltk_type]
+
+        for nltk_type in selected_title_type:
+            type_to_replace_with = random.choice(local_rand_list[ind])
+            local_rand_list[ind].remove(type_to_replace_with)
+            selected_title = selected_title.replace(nltk_type,type_to_replace_with)
+            selected_blurb = selected_blurb.replace(nltk_type,type_to_replace_with)
 
     if debug:
         print("NEW:",selected_title)
 
-    return selected_title
+    return selected_title,selected_blurb
+
+if __name__ == "__main__":
+    for i in range(1):
+        print(get_project())
+
