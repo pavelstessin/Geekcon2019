@@ -18,8 +18,9 @@ bad_words = ['the','and','for','project','new','album','film','with','from','you
 titles = []
 nnp_list = {}
 randomization_list = []
-rewrite = 1
+rewrite = 0
 debug = 0
+
 
 def add_data(filename, name_loc, write_data):
     global titles,nnp_list,randomization_list
