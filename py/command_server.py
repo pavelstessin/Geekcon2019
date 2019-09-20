@@ -18,16 +18,22 @@ class GeekconHTTPRequestHandler(SimpleHTTPRequestHandler):
             curtime = datetime.datetime.now()
             print('> {} Command: {}, parameters: {}'.format(curtime, command_name, params))
 
-            method_to_call = getattr(commands, command_name)
-            result = method_to_call(params)
-            curtime = datetime.datetime.now()
-            print('< {} Command: {}, parameters: {}, got result: {}\n'.format(curtime, command_name, params, result))
+            if command_name == 'index':
+                # return the index.html file
+                print('<> Requested index; returning our page')
+                self.path = '/index.html'
+                return super(GeekconHTTPRequestHandler, self).do_GET()
+            else:
+                method_to_call = getattr(commands, command_name)
+                result, code, content_type = method_to_call(params)
+                curtime = datetime.datetime.now()
+                print('< {} Command: {}, parameters: {}, got result: {}\n'.format(curtime, command_name, params, result))
 
-            self.send_response(HTTPStatus.OK)
-            # self.send_header("Content-type", 'application/json')
-            self.send_header("Content-type", 'text/plain')
-            self.end_headers()
-            self.wfile.write(result.encode('utf-8'))
+                self.send_response(HTTPStatus.OK)
+                # self.send_header("Content-type", 'application/json')
+                self.send_header("Content-type", 'text/plain')
+                self.end_headers()
+                self.wfile.write(result.encode('utf-8'))
         except Exception as e:
             print(e)
             self.send_error(HTTPStatus.NOT_FOUND, message=e.__str__())

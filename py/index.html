@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script>
+    const myRequest = new XMLHttpRequest();
+    console.log('Hi there; scripts are running');
+    myRequest.open('GET', 'http://192.168.43.31:8000/get_project_name?word=i_am_client');
+    myRequest.send();
+    myRequest.onreadystatechange = function () {
+        if (myRequest.readyState === 4) {
+            document.getElementById('ajax-content').innerHTML = myRequest.responseText;
+        }
+    };
+
+</script>
+<body>
+
+    <h1 id="ajax-content">
+        I just woke up.
+    </h1>
+
+</body>
+</html>
+
