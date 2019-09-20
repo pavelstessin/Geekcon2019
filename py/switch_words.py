@@ -18,7 +18,7 @@ bad_words = ['the','and','for','project','new','album','film','with','from','you
 titles = []
 nnp_list = {}
 randomization_list = []
-rewrite = 0
+rewrite = 1
 debug = 0
 
 def add_data(filename, name_loc, write_data):
@@ -109,7 +109,29 @@ def test_random_switch(filename, name_loc):
 # add_data("../db/ks-projects-201801.csv",1)
 add_data("../db/kickstarter.csv",9,rewrite)
 
-for i in range(100):
+if __name__ == "__main__":
+    for i in range(100):
+        local_rand_list = randomization_list[:]
+        # print(local_rand_list)
+        selected_title = random.choice(titles)
+        selected_title_nltk = nltk.pos_tag(nltk.word_tokenize(selected_title))
+        selected_title_nnps = [i[0] for i in selected_title_nltk if i[1] == "NNP"]
+        if debug:
+            print("ORIGINAL:",selected_title)
+            print(nltk.pos_tag(nltk.word_tokenize(selected_title)))
+        for nnp in selected_title_nnps:
+            nnp_to_replace_with = random.choice(randomization_list)
+            local_rand_list.remove(nnp_to_replace_with)
+            selected_title = selected_title.replace(nnp,nnp_to_replace_with)
+
+        if debug:
+            print("NEW:",selected_title)
+
+        print(selected_title)
+    # print(nnp_list)
+    #print(title_list)
+
+def get_project():
     local_rand_list = randomization_list[:]
     # print(local_rand_list)
     selected_title = random.choice(titles)
@@ -118,14 +140,12 @@ for i in range(100):
     if debug:
         print("ORIGINAL:",selected_title)
         print(nltk.pos_tag(nltk.word_tokenize(selected_title)))
-    for nnp in selected_title_nnps:
-        nnp_to_replace_with = random.choice(randomization_list)
-        local_rand_list.remove(nnp_to_replace_with)
-        selected_title = selected_title.replace(nnp,nnp_to_replace_with)
+        for nnp in selected_title_nnps:
+            nnp_to_replace_with = random.choice(randomization_list)
+            local_rand_list.remove(nnp_to_replace_with)
+            selected_title = selected_title.replace(nnp,nnp_to_replace_with)
 
     if debug:
         print("NEW:",selected_title)
 
-    print(selected_title)
-# print(nnp_list)
-#print(title_list)
+    return selected_title
