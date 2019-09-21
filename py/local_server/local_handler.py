@@ -3,13 +3,14 @@
 import datetime
 import json
 from http import HTTPStatus
+from threading import Thread
 from http.server import SimpleHTTPRequestHandler
 from urllib import parse
 import sys
 sys.path.append("..")
 from common.generic_server import Server
 from local_server.local_commands import poll_for_updates
-
+import local_server
 PORT = 8000
 
 
@@ -45,4 +46,6 @@ class LocalRequestHandler(SimpleHTTPRequestHandler):
 
 
 if __name__ == '__main__':
+    process = Thread(target=local_server.local_commands.check_green_button)
+    process.start()
     Server('RPi server', LocalRequestHandler, PORT)
