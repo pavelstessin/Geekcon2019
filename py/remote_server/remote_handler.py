@@ -23,6 +23,7 @@ class RemoteRequestHandler(SimpleHTTPRequestHandler):
             print('> {} Command: {}, parameters: {}'.format(curtime, command_name, params))
 
             result, code, content_type = getattr(remote_commands, command_name)(params)
+            print('< {} Command: {}, parameters: {}, Result: {}'.format(curtime, command_name, params, result))
             self.send_response(code)
             self.send_header("Content-type", content_type)
             self.end_headers()

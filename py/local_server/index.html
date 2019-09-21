@@ -13,7 +13,28 @@
         myRequest.send();
         myRequest.onreadystatechange = function () {
             if (myRequest.readyState === 4) {
-                document.getElementById('ajax-content').innerHTML = myRequest.responseText;
+                const resp = JSON.parse(myRequest.responseText);
+                let state, title, desc = '';
+                switch (resp.state) {
+                    case 'idle':
+                        state = 'Idle';
+                        title = resp.title || 'Let me suggest a project!';
+                        desc = resp.description || 'use the buttons to give your preference';
+                        break;
+                    case 'wait':
+                        state = 'Please Wait...';
+                        title = resp.title || 'On my way...';
+                        desc = resp.description || 'Crunching billions of projects, stand by';
+                        break;
+                    default:
+                        state = resp.state;
+                        title = resp.title;
+                        desc = resp.description;
+                }
+
+                document.getElementById('state').innerHTML = state;
+                document.getElementById('title').innerHTML = title;
+                document.getElementById('desc').innerHTML = desc;
                 setTimeout(poll, 1000)
             }
         };
@@ -25,9 +46,9 @@
 </script>
 <body>
 
-    <h1 id="ajax-content">
-        I just woke up.
-    </h1>
+    <h1 id="title"></h1>
+    <h4 id="desc"></h4>
+    <div>State: <span id="state">I just woke up - if you see this, I didn't yet get anything from my local server</span></div>
 
 </body>
 </html>

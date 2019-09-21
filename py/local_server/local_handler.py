@@ -29,7 +29,9 @@ class LocalRequestHandler(SimpleHTTPRequestHandler):
                 self.path = '/index.html'
                 return super(LocalRequestHandler, self).do_GET()
             else:
+                print('> Polling for updates')
                 result, code, content_type = poll_for_updates()
+                print('< Update: {}'.format(result))
                 self.send_response(code)
                 self.send_header("Content-type", content_type)
                 self.end_headers()
