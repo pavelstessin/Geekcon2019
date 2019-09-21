@@ -23,13 +23,15 @@
                         break;
                     case 'wait':
                         state = 'Please Wait...';
-                        title = resp.title || 'On my way...';
+                        title = resp.title || 'You clicked a button...';
                         desc = resp.description || 'Crunching billions of projects, stand by';
                         break;
+                    case 'results_ready':
+                        // fall-through
                     default:
                         state = resp.state;
                         title = resp.title;
-                        desc = resp.description;
+                        desc = resp.description + '<p>Generate Another ?</p>';
                 }
 
                 document.getElementById('state').innerHTML = state;
